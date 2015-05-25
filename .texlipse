@@ -1,0 +1,14 @@
+#TeXlipse project settings
+#Mon May 25 19:48:34 CEST 2015
+markTmpDer=true
+builderNum=2
+outputDir=
+makeIndSty=
+bibrefDir=
+outputFormat=pdf
+tempDir=tmp
+mainTexFile=csc-586a-13.tex
+outputFile=csc-586a-13.pdf
+langSpell=en
+markDer=true
+srcDir=
