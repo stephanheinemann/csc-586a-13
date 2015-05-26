@@ -94,14 +94,21 @@ repeated information at intervals is periodic sampling of the data which is
 performed by calling {\em startMagnetometerUpdates} and then simply reading the
 {\em magnetomerData} property. In the case of both of these methods it is
 important that the {\em stopMagnetometerUpdates} method is called when the
-system no longer needs to process magnetometer data. In order to access the 
-data acquired from the most recent polling of the sensors {\em
-magnetometerData} must be accessed, this is a property of type
-{\em CMMagnetometerData}. There are also two methods made for simply polling the
-sensor to see if it is working or available {\em magnetometerActive} and {\em
-magnetometerAvailable}. {\em magnetometerActive} checks to see if the sensor is
-currently taking readings and {\em magnetometerAvailable} checks to see if the
-sensor is available for use.
+system no longer needs to process magnetometer data. 
+
+\par
+In order to access the data acquired from the most recent polling of the sensors {\em
+magnetometerData} must be accessed, this property is a structure of type
+{\em CMMagnetometerData}. It contains three int values x, y, and z. These int
+values represent directional magnetic field relative to the body of the device
+using microteslas as units. With regards to the coordinate system used here The z
+axis is positive up through the front of the screen, the y axis is positive up
+through the top of the phone, and the x axis is positive to the right of the device
+if the screen is facing you. There are also two methods made for simply polling the
+sensor to see if it is working or available {\em magnetometerActive} and 
+{\em magnetometerAvailable}. {\em magnetometerActive} checks to see if the sensor
+is currently taking readings and {\em magnetometerAvailable} checks to see if the sensor is
+available for use.
 
 \par
 The purpose of having the two separate collection methods is one of resource
