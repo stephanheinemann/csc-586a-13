@@ -94,7 +94,14 @@ repeated information at intervals is periodic sampling of the data which is
 performed by calling {\em startMagnetometerUpdates} and then simply reading the
 {\em magnetomerData} property. In the case of both of these methods it is
 important that the {\em stopMagnetometerUpdates} method is called when the
-system no longer needs to process magnetometer data.
+system no longer needs to process magnetometer data. In order to access the 
+data acquired from the most recent polling of the sensors {\em
+magnetometerData} must be accessed, this is a property of type
+{\em CMMagnetometerData}. There are also two methods made for simply polling the
+sensor to see if it is working or available {\em magnetometerActive} and {\em
+magnetometerAvailable}. {\em magnetometerActive} checks to see if the sensor is
+currently taking readings and {\em magnetometerAvailable} checks to see if the
+sensor is available for use.
 
 \par
 The purpose of having the two separate collection methods is one of resource
