@@ -262,6 +262,27 @@ in Figure \ref{fig:of_sensor_board_api}.
 	\label{fig:of_sensor_board_api}
 \end{figure}
 
+\subsection{Application Example}
+\par
+A small application example makes use of the {\em PX$4$ Optical Flow} board
+connected to the {\em Iris} {\em Pixhawk} autopilot module. The application
+realizes a flight envelope warning alert. The alert is triggered whenever
+translational flow or rotational body rates exceed a certain limit. It is
+also triggered when the \ac{AHRS}\footnote{
+http://en.wikipedia.org/wiki/Attitude\_and\_heading\_reference\_system}
+which fuses different sensor inputs for the current height of the aircraft
+including the sonar distance reports a height above ground that exceeds a
+certain threshold.
+
+\par
+The alert consist a series of high pitch tones whenever the normal envelope
+is violated and a long low pitch tone as soon as the normal flight envelope
+is re-established. Furthermore, the aircraft status \ac{LED} continues to
+flash red as long as the normal envelope is violated.
+
+\subsection{Appliction in the Cloud}
+\par
+
 \clearpage
 \label{appendix}
 \input{csc-586a-13-appendix}
