@@ -155,20 +155,19 @@ being used as a magnetometer in an experiment measuring magnetic flux.
 
 \subsection{NuttX / ArduPilot PX4 Optical Flow and Sonar API}
 \label{ardupilot_flow_api}
+\lstset{language=C++}
 \par
 The {\em ArduPilot}\footnote{http://ardupilot.com/} autopilot stack supports a
 wide range of sensors to be used with any of the supported vehicle types
 including {\em Plane}, {\em Copter} and {\em Rover}. It builds on top of the
 {\em NuttX}\footnote{http://nuttx.org/} operating system and requires the
 applicable firmware for the underlying hardware such as the
-{\em Pixhawk}\footnote{https://pixhawk.org}.
+{\em Pixhawk}\footnote{https://pixhawk.org} autopilot module.
 
 \par
 The supported sensor types include those to capture data about the vehicle's
 {\em environment} as well as those related to its own {\em capabilities} in
 order to establish an adequate {\em situational awareness}.
-
-\par
 Examples of supported environment sensors gather {\em inertial} (attitude and
 acceleration), {\em barometric} (altitude and airspeed), {\em magnetic}
 (direction), {\em range} (distance), {\em optical} (orientation and recognition)
@@ -183,12 +182,12 @@ vehicle's capability state.
 
 \par
 The {ArduPilot} \ac{API} separates sensor {\em frontends} (interfaces) from
-their actual {\em backends} (implementation) in order to easily support
-different sensors of the same type. These and other \ac{HAL} modules can be
-found in the {\verb libraries }
+their actual {\em backends} (implementations) in order to easily support
+different sensors of the same class. These and other \ac{HAL} modules can be
+found in the \texttt{libraries}
 directory\footnote{https://github.com/diydrones/ardupilot} and are, hence,
 separate from any concrete vehicle-related software. The {\em Copter} vehicle
-employs the sensor \ac{API} through its {\verb sensors.pde } arduino sketch
+employs the sensor \ac{API} through its \texttt{sensors.pde} arduino sketch
 file which represents an even higher level
 \ac{API}\footnote{http://www.arduino.cc/en/pmwiki.php?n=Reference/HomePage}
 to the actual vehicle functions such as different autoflight modes.
@@ -196,7 +195,18 @@ to the actual vehicle functions such as different autoflight modes.
 \par
 As a representative example, the structure of the {\em PX$4$ Optical Flow /
 Sonar}\footnote{https://pixhawk.org/modules/px4flow} sensor interface shall be
-explained. This sensor allows to capture the optical flow, that is, the rate of
+explained. It is connected to the {\em Pixhawk} autopilot module as shown in
+Figure \ref{fig:pixhawk_px4_flow_connection}.
+
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=400px]{graphics/PixhawkPX4Flow.png}
+	\caption{Pixhawk PX4 Flow Connection}
+	\label{fig:pixhawk_px4_flow_connection}
+\end{figure}
+
+\par
+This sensor allows to capture the optical flow, that is, the rate of
 translational and rotational changes in a captured image, in order to establish
 positional information. The optical flow camera is mounted on the bottom of the
 {\em Iris}\footnote{http://3drobotics.com/iris/} quadcopter body pointing
@@ -204,42 +214,36 @@ downwards and sampling the floor pattern that is being overflown. Since the
 aircraft can be tilted (pitch and bank) and flown at different altitudes, a
 range finder (sonar sensor) on the same sensor board is employed to relate the
 optical flow information to the measured ground distances accordingly. Assuming
-the actual attitude of the aircraft based on inertial sensors, an actual ground
-distance can be derived from the sonar slant range readings.
+the actual attitude of the aircraft based on inertial sensors is known, an
+actual ground distance can be derived from the sonar slant range readings.
 
 \par
 Figure \ref{fig:optical_flow_api} shows a small extract of the optical flow
-sensor frontend \ac{API} in the {\verb libraries/ } {\verb AP_OpticalFlow }
+sensor frontend \ac{API} in the \texttt{libraries/} \texttt{AP\_OpticalFlow}
 directory possessing the sensor state data structure as well as methods that determine
 flow and body rates in a two-dimensional image. The interface itself
 furthermore consists of methods that determine the health of the sensor and the
 quality of the data being captured by it.
 
 \begin{figure}[h]
-	\begin{lstlisting}
-	class OpticalFlow
-	{
-	    //...
-	public:
-		//...
-	    bool enabled() const { return _enabled; }
-	    bool healthy() const { return backend != NULL && _flags.healthy; }
-	    void update(void);
-	    uint8_t quality() const { return _state.surface_quality; }
-	    const Vector2f& flowRate() const { return _state.flowRate; }
-	    const Vector2f& bodyRate() const { return _state.bodyRate; }
-	    uint8_t device_id() const { return _state.device_id; }
-	    uint32_t last_update() const { return _last_update_ms; }
-	
-	    struct OpticalFlow_state {
-	        uint8_t device_id;
-	        uint8_t  surface_quality;
-	        Vector2f flowRate;
-	        Vector2f bodyRate;
-	    };
-	private:
-		//...
-	};
+	\begin{lstlisting}[basicstyle=\scriptsize]
+class OpticalFlow { //...
+public: //...
+	bool enabled() const { return _enabled; }
+	bool healthy() const { return backend != NULL && _flags.healthy; }
+	uint8_t quality() const { return _state.surface_quality; }
+	const Vector2f& flowRate() const { return _state.flowRate; }
+	const Vector2f& bodyRate() const { return _state.bodyRate; }
+	uint8_t device_id() const { return _state.device_id; }
+    //...
+    struct OpticalFlow_state {
+    	uint8_t device_id;
+    	uint8_t  surface_quality;
+    	Vector2f flowRate;
+    	Vector2f bodyRate;
+    };
+private: //...
+};
 	\end{lstlisting}
 	\caption{Optical Flow Sensor \ac{API}}
 	\label{fig:optical_flow_api}
@@ -250,40 +254,46 @@ Figure \ref{fig:range_finder_api} shows an \ac{API} extract of the range finder
 component of the optical flow sensor board. On the {\em PX$4$ Optical Flow}
 board, a sonar sensor is employed to obtain range in order to relate optical
 flow to ground distance. This concrete implementation is abstracted by the
-more generic range finder \ac{API} in the %{\verb libraries/AP_RangeFinder }
+more generic range finder \ac{API} in the \texttt{libraries/AP\_RangeFinder}
 directory.
 
 \begin{figure}[h]
-	\begin{lstlisting}
-	class RangeFinder
-	{
-	public:
-		//...
-	    struct RangeFinder_State {
-	        uint8_t                		instance;
-	        uint16_t               		distance_cm;
-	        uint16_t               		voltage_mv;
-	        enum RangeFinder_Status		status;
-	        uint8_t                		range_valid_count;
-			//...
-	    };
-	    //...
-	    void update(void);
-	    uint16_t distance_cm() //...
-	    int16_t ground_clearance_cm() //...
-	    RangeFinder_Status status(void) //...
-	    bool has_data() //...
-	    uint8_t range_valid_count() //...
-	private:
-		//...
+	\begin{lstlisting}[basicstyle=\scriptsize]
+class RangeFinder {
+public: //...
+	enum RangeFinder_Status {
+		RangeFinder_NotConnected = 0,
+		RangeFinder_NoData,
+		RangeFinder_OutOfRangeLow,
+		RangeFinder_OutOfRangeHigh,
+		RangeFinder_Good
 	};
+	
+	struct RangeFinder_State {
+		uint8_t instance;
+		uint16_t distance_cm;
+		uint16_t voltage_mv;
+		enum RangeFinder_Status status;
+		uint8_t range_valid_count;
+		bool pre_arm_check;
+		uint16_t pre_arm_distance_min;
+		uint16_t pre_arm_distance_max;
+	};
+	//...
+	uint16_t distance_cm() const { return distance_cm(primary_instance); }
+	uint16_t voltage_mv() const { return voltage_mv(primary_instance); }
+	int16_t ground_clearance_cm() const { return _ground_clearance_cm[primary_instance]; }
+	RangeFinder_Status status(void) const { return status(primary_instance);
+	//...
+private: //...
+};
 	\end{lstlisting}
 	\caption{Range Finder \ac{API}}
 	\label{fig:range_finder_api}
 \end{figure}
 
 \par
-The {\verb sensors.pde } arduino sketch file uses the above \ac{API} in order
+The \texttt{sensors.pde} arduino sketch file uses the above \ac{API} in order
 to provide the {\em Copter} vehicle with necessary sensor data to perform its
 functions such as automatic flight modes. The overall static structure is shown
 in Figure \ref{fig:of_sensor_board_api}.
@@ -315,6 +325,15 @@ flash red as long as the normal envelope is violated.
 
 \subsection{Appliction in the Cloud}
 \par
+The optical flow sensor can be used to establish position and, hence, to
+support higher-level autopilot modes such as loitering and following a
+sequence of legs between waypoints. It can be fused with other sensor data
+and provide a higher degree of redundancy. The tracks and sensor data of
+small \acp{UAV} can be shared in the cloud. Such an existing project is
+called {\em Dronshare}\footnote{http://www.droneshare.com/}. Having access
+to and being able to mine shared mission data would enable the more
+efficient planning and execution of coordinated missions that involve
+multiple \acp{UAV}.
 
 \clearpage
 \label{appendix}
