@@ -61,11 +61,44 @@ not effective (mavlink\_msg\_optical\_flow\_send)
 - TODO: order longer Iris legs
 \end{comment}
 
-\subsection{Android Gyroscope API}
+\subsection{Android Sensor API}
 \label{android_gyroscope_api}
 \par
+Android devices have a wide variety of sensors available to them, of both the hardware and software variety. For Android, hardware sensors are physical components build into the Android device, while software sensors are built on top of one or more hardware sensors, and interpret their data in a more useful fashion. Sensors for Android devices usually fall into one of these three categories: motion sensors, environmental sensors, and position sensors.\\
 
+\par
+The Sensor API for Android consists of four main classes and interfaces, {\em SensorManager}, {\em Sensor}, {\em SensorEventListener}, and {\em SensorEvent}.\\
 
+\par
+The {\em SensorManager} class is used to access a device's sensors. The following code is how you would get an instance of this class.\\
+
+\begin{lstlisting} [language=java]
+SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+\end{lstlisting}
+
+\par
+The {\em Sensor} class represents one of the device's sensors. Each Sensor has a unique type, which is used to get an instance of that sensor. For example, to get the Gyroscope sensor, you would use the following code.\\
+
+\begin{lstlisting} [language=java]
+Sensor s =  sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+\end{lstlisting}
+
+\par
+{\em SensorEventListener} is an interface that contains two callback functions for the user to implement, onSensorChanged(SensorEvent event), and onAccuracyChanged(Sensor sensor, int accuracy). Say I have implemented {\em SensorEventListener} in a class called {\em MySensorEventListener}, for the Gyroscope sensor. To register a listener, the code would look like this:\\
+
+\begin{lstlisting} [language=java]
+MySensorEventListener msel = new MySensorEventListener();
+sm.registerListener(msel, s, SensorManager.SENSOR_DELAY_UI);
+\end{lstlisting}
+
+\par
+SENSOR\_DELAY\_UI is one of four different delay settings, measured in microseconds, that controls how often onSensorChanged (the callback function) is called. These are, in order of fastest to slowest, SENSOR\_DELAY\_FASTEST, SENSOR\_DELAY\_GAME, SENSOR\_DELAY\_NORMAL, and SENSOR\_DELAY\_UI. This timing is just a hint to the system, events may be received faster or slower the the specified rate. From Android 2.3 onwards, you can specify any delay in microseconds, not just these four constants.\\
+
+\par
+A {\em SensorEvent} consists of four fields - the accuracy of the event, which sensor generated the event, a timestamp indicating the time in nanoseconds that the event occurred at, and a float array of values, whose length and contents depends upon the type of sensor being monitored. For the Gyroscope sensor, this float array contains three values, the angular speed around the x, y, and z axis' in radians/second.\\
+
+\par
+The Android Sensor API consists of these four classes and interfaces - it doesn't matter what sensor you are monitoring, the only thing that changes is the implementation of onSensorChanged and onAccuracyChanged. This is a very nice generic interface for Sensors.\footnote{All information is sourced from the Android Documentation: developer.android.com/guide/topics/sensors/sensors\_overview.html}
 
 \subsection{iOS Magnetic Compass API}
 \label{ios_compass_api}
