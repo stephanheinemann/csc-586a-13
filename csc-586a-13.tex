@@ -39,75 +39,94 @@
 \maketitle 
 
 \section{Part III -- Sensor APIs}
-\label{part3}
-
-\begin{comment}
-iOS
-android
-arduino
-pixhawk / ardupilot / nuttx
-- AP\_RangeFinder (maxsonar i$2$c, state object)
-- AP\_OpticalFlow (frontend, backend, state object)
-- AP\_AHRS (attitude, heading reference system) uses the optflow object
-- sensors.pde uses the optical flow state to supply the EKF and the logger
-(update\_opticalflow) - Log.pde writes log messages about the current optical flow state
-windows fsx sdk (real hardware interface) -> garmin sdk
-- sensors.pde uses the sonar sensor to determine the sonar height (read\_sonar)
-- log.pde logs sonar sensor in control\_tuning and optical flow in
-log\_write\_optflow
-- GCS\_Common.cpp sends the mavlink message to the GCS and uses the sonar height
-above ground level (HAGL) - data is used directly and changing logged data is
-not effective (mavlink\_msg\_optical\_flow\_send)
-- TODO: order longer Iris legs
-\end{comment}
+\label{sec:part3}
 
 \subsection{Android Sensor API}
-\label{android_gyroscope_api}
+\label{sec:android_sensor_api}
 \par
-Android devices have a wide variety of sensors available to them, of both the hardware and software variety. For Android, hardware sensors are physical components build into the Android device, while software sensors are built on top of one or more hardware sensors, and interpret their data in a more useful fashion. Sensors for Android devices usually fall into one of these three categories: motion sensors, environmental sensors, and position sensors.\\
+Android devices have a wide variety of sensors available to them, of both the
+hardware and software variety. For Android, hardware sensors are physical
+components build into the Android device, while software sensors are built on
+top of one or more hardware sensors, and interpret their data in a more useful
+fashion. Sensors for Android devices usually fall into one of these three
+categories: motion sensors, environmental sensors, and position sensors.
 
 \par
-The Sensor API for Android consists of four main classes and interfaces, {\em SensorManager}, {\em Sensor}, {\em SensorEventListener}, and {\em SensorEvent}.\\
+The Sensor \ac{API} for Android consists of four main classes and interfaces,
+\texttt{SensorManager}, \texttt{Sensor}, \texttt{SensorEventListener}, and
+\texttt{SensorEvent}.
 
 \par
-The {\em SensorManager} class is used to access a device's sensors. The following code is how you would get an instance of this class.\\
+The \texttt{SensorManager} class is used to access a device's sensors. The
+following code demonstrates the instantiation of this class:
 
-\begin{lstlisting} [language=java]
+\begin{lstlisting}[basicstyle=\small,language=Java]
 SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 \end{lstlisting}
 
 \par
-The {\em Sensor} class represents one of the device's sensors. Each Sensor has a unique type, which is used to get an instance of that sensor. For example, to get the Gyroscope sensor, you would use the following code.\\
+The \texttt{Sensor} class represents one of the device's sensors. Each sensor
+has a unique type, which is used to get an instance of that sensor.
+For example, to get a gyroscope sensor instance, the following code snippet
+is used:
 
-\begin{lstlisting} [language=java]
+\begin{lstlisting}[basicstyle=\small,language=Java]
 Sensor s =  sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 \end{lstlisting}
 
 \par
-{\em SensorEventListener} is an interface that contains two callback functions for the user to implement, onSensorChanged(SensorEvent event), and onAccuracyChanged(Sensor sensor, int accuracy). Say I have implemented {\em SensorEventListener} in a class called {\em MySensorEventListener}, for the Gyroscope sensor. To register a listener, the code would look like this:\\
+\texttt{SensorEventListener} is an interface that contains two listener
+methods to be implemented by the user:
 
-\begin{lstlisting} [language=java]
+\begin{lstlisting}[basicstyle=\small,language=Java]
+onSensorChanged(SensorEvent event)
+onAccuracyChanged(Sensor sensor, int accuracy)
+\end{lstlisting}
+
+\par
+Assuming an implementation of \texttt{SensorEventListener} in a class called\\
+\texttt{MySensorEventListener}, for the gyroscope sensor, its registration
+code would look like this:
+
+\begin{lstlisting}[basicstyle=\small,language=Java]
 MySensorEventListener msel = new MySensorEventListener();
 sm.registerListener(msel, s, SensorManager.SENSOR_DELAY_UI);
 \end{lstlisting}
 
 \par
-SENSOR\_DELAY\_UI is one of four different delay settings, measured in microseconds, that controls how often onSensorChanged (the callback function) is called. These are, in order of fastest to slowest, SENSOR\_DELAY\_FASTEST, SENSOR\_DELAY\_GAME, SENSOR\_DELAY\_NORMAL, and SENSOR\_DELAY\_UI. This timing is just a hint to the system, events may be received faster or slower the the specified rate. From Android 2.3 onwards, you can specify any delay in microseconds, not just these four constants.\\
+\texttt{SENSOR\_DELAY\_UI} is one of four different delay settings, measured in
+microseconds, that controls how often \texttt{onSensorChanged} listener method
+is called. These are, in order of fastest to slowest,
+\texttt{SENSOR\_DELAY\_FASTEST}, \texttt{SENSOR\_DELAY\_GAME},
+\texttt{SENSOR\_DELAY\_NORMAL}, and\\ \texttt{SENSOR\_DELAY\_UI}. This timing
+is just a hint to the system, events may be received faster or slower the the
+specified rate. From Android $2.3$ onwards, you can specify any delay in
+microseconds, not just these four constants.
 
 \par
-A {\em SensorEvent} consists of four fields - the accuracy of the event, which sensor generated the event, a timestamp indicating the time in nanoseconds that the event occurred at, and a float array of values, whose length and contents depends upon the type of sensor being monitored. For the Gyroscope sensor, this float array contains three values, the angular speed around the x, y, and z axis' in radians/second.\\
+A \texttt{SensorEvent} consists of four fields - the accuracy of the event,
+which sensor generated the event, a timestamp indicating the time in
+nanoseconds that the event occurred at, and a float array of values, whose
+length and contents depends upon the type of sensor being monitored. For the
+gyroscope sensor, this float array contains three values, the angular speed
+around the $x$, $y$, and $z$ axis' in radians/second.
 
 \par
-The Android Sensor API consists of these four classes and interfaces - it doesn't matter what sensor you are monitoring, the only thing that changes is the implementation of onSensorChanged and onAccuracyChanged. This is a very nice generic interface for Sensors.\footnote{All information is sourced from the Android Documentation: developer.android.com/guide/topics/sensors/sensors\_overview.html}
+The Android Sensor \ac{API} consists of these four classes and interfaces - it
+does not matter what sensor you are monitoring, the only thing that changes is
+the implementation of\\ \texttt{onSensorChanged} and \texttt{onAccuracyChanged}.
+This is a very nice generic interface for Sensors.\footnote{All information is
+sourced from the Android documentation:\\
+developer.android.com/guide/topics/sensors/sensors\_overview.html}
 
 \subsection{iOS Magnetic Compass API}
-\label{ios_compass_api}
+\label{sec:ios_compass_api}
 \par
 The {\em iOS}\footnote{https://www.apple.com/ca/ios/what-is/} platform used on
 {\em Apple}\footnote{https://www.apple.com} phones and tablets supports a
-variety of motion services via an object called {\em CMMotionManager}. This
-object is the gateway to raw {\em accelerometer/gyroscope/magnetometer} data, as
-well as some processed data such as {\em rotation rate}, {\em attitude},
+variety of motion services via an object called \texttt{CMMotionManager}. This
+object is the gateway to raw {\em accelerometer/gyroscope/magnetometer} data,
+as well as some processed data such as {\em rotation rate}, {\em attitude},
 {\em calibrated magnetic fields}, {\em direction of gravity}, and {\em the
 direction of acceleration of the device}.
 Of particular interest here, however, is the magnetometer and how the device
@@ -115,33 +134,35 @@ handles the data collected by this sensor.
 
 \par
 The magnetometer in the device collects magnetic field data, such as strength
-and polarity, which is accessible via the {\em CMMotionManager} object discussed
-above by either setting an interval at which updates can be pushed, or by
-polling the sensor whenever an update is required. If requesting updates at
-intervals the {\em accelerometerUpdateInterval} property must be specified and
-the {\em startMagnetometerUpdatesToQueue:withHandler:} method is called which
-requires a {\em CMMagnetometerHandler} type object be passed into it. This
-method will add data to a queue which can then be processed as needed. The
+and polarity, which is accessible via the \texttt{CMMotionManager} object
+discussed above by either setting an interval at which updates can be pushed,
+or by polling the sensor whenever an update is required. If requesting updates
+at intervals the \texttt{accelerometerUpdateInterval} property must be specified
+and the \texttt{startMagnetometerUpdatesToQueue:withHandler:} method is called
+which requires a \texttt{CMMagnetometerHandler} type object be passed into it.
+This method will add data to a queue which can then be processed as needed. The
 purpose of the Handler is simply error handling. The alternative to requesting
 repeated information at intervals is periodic sampling of the data which is
-performed by calling {\em startMagnetometerUpdates} and then simply reading the
-{\em magnetomerData} property. In the case of both of these methods it is
-important that the {\em stopMagnetometerUpdates} method is called when the
-system no longer needs to process magnetometer data. 
+performed by calling \texttt{startMagnetometerUpdates} and then simply reading
+the \texttt{magnetomerData} property. In the case of both of these methods it
+is important that the \texttt{stopMagnetometerUpdates} method is called when
+the system no longer needs to process magnetometer data. 
 
 \par
-In order to access the data acquired from the most recent polling of the sensors {\em
-magnetometerData} must be accessed, this property is a structure of type
-{\em CMMagnetometerData}. It contains three int values x, y, and z. These int
-values represent directional magnetic field relative to the body of the device
-using microteslas as units. With regards to the coordinate system used here The z
-axis is positive up through the front of the screen, the y axis is positive up
-through the top of the phone, and the x axis is positive to the right of the device
-if the screen is facing you. There are also two methods made for simply polling the
-sensor to see if it is working or available {\em magnetometerActive} and 
-{\em magnetometerAvailable}. {\em magnetometerActive} checks to see if the sensor
-is currently taking readings and {\em magnetometerAvailable} checks to see if the sensor is
-available for use.
+In order to access the data acquired from the most recent polling of the
+sensors\\
+\texttt{magnetometerData} must be accessed, this property is a structure of type
+\texttt{CMMagnetometerData}. It contains three \texttt{int} values $x$, $y$, and
+$z$. These \texttt{int} values represent the directional magnetic field relative
+to the body of the device using microteslas as unit. With regards to the
+coordinate system used here the $z$ axis is positive up through the front of the
+screen, the $y$ axis is positive up through the top of the phone, and the $x$
+axis is positive to the right of the device if the screen is facing you. There
+are also two methods made for simply polling the sensor to see if it is working
+or available \texttt{magnetometerActive} and \texttt{magnetometerAvailable}. The
+method \texttt{magnetometerActive} checks to see if the sensor is currently
+taking readings and \texttt{magnetometerAvailable} checks to see if the sensor
+is available for use.
 
 \par
 The purpose of having the two separate collection methods is one of resource
@@ -149,12 +170,13 @@ management. If the purpose of the app being written is something like a game or
 some sort of mapping software, it is unnecessary to acquire data rapidly and
 keep it in a queue. Most programs intended for light users will simply need to
 query the sensor once per frame rendered on the screen at the very most. The
-only time it would be necessary to use the queueing method is if the data needs to be incredibly
-precise and with little latency between updates, such as if the device were
-being used as a magnetometer in an experiment measuring magnetic flux.
+only time it would be necessary to use the queuing method is if the data needs
+to be incredibly precise and with little latency between updates, such as if
+the device were being used as a magnetometer in an experiment measuring
+magnetic flux.
 
 \subsection{NuttX / ArduPilot PX4 Optical Flow and Sonar API}
-\label{ardupilot_flow_api}
+\label{sec:ardupilot_flow_api}
 \lstset{language=C++}
 \par
 The {\em ArduPilot}\footnote{http://ardupilot.com/} autopilot stack supports a
@@ -175,7 +197,7 @@ and {\em satellite} (position) data. Sensors that capture the vehicle's
 capability state include a {\em battery monitor} (power consumption and
 endurance) and a {\em performance monitor} (scheduler latency). Environment
 sensors themselves may provide {\em health} and {\em quality} monitoring
-fuctions. Furthermore, all information that is provided by the {\em NuttX}
+functions. Furthermore, all information that is provided by the {\em NuttX}
 operating system about its {\em Pixhawk} platform including the available
 {\em memory} and {\em filesystem} space can be instrumented to enhance the
 vehicle's capability state.
@@ -306,6 +328,7 @@ in Figure \ref{fig:of_sensor_board_api}.
 \end{figure}
 
 \subsection{Application Example}
+\label{sec:application_example}
 \par
 A small application example makes use of the {\em PX$4$ Optical Flow} board
 connected to the {\em Iris} {\em Pixhawk} autopilot module. The application
@@ -323,7 +346,8 @@ is violated and a long low pitch tone as soon as the normal flight envelope
 is re-established. Furthermore, the aircraft status \ac{LED} continues to
 flash red as long as the normal envelope is violated.
 
-\subsection{Appliction in the Cloud}
+\subsection{Application in the Cloud}
+\label{sec:application_cloud}
 \par
 The optical flow sensor can be used to establish position and, hence, to
 support higher-level autopilot modes such as loitering and following a
@@ -331,9 +355,11 @@ sequence of legs between waypoints. It can be fused with other sensor data
 and provide a higher degree of redundancy. The tracks and sensor data of
 small \acp{UAV} can be shared in the cloud. Such an existing project is
 called {\em Dronshare}\footnote{http://www.droneshare.com/}. Having access
-to and being able to mine shared mission data would enable the more
+to and being able to mine shared mission data enables the more
 efficient planning and execution of coordinated missions that involve
-multiple \acp{UAV}.
+multiple \acp{UAV}. Examples of coordinated missions include {\em aerial
+surveillance}, {\em crop spraying} and {\em search and rescue} among many
+other applications.
 
 \clearpage
 \label{appendix}
