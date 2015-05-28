@@ -1,3 +1,127 @@
+\section{Figures}
+\label{figures}
+
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=300px]{graphics/PixhawkPX4Flow.png}
+	\caption{Pixhawk PX4 Flow Connection}
+	\label{fig:pixhawk_px4_flow_connection}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{lstlisting}[basicstyle=\scriptsize]
+class OpticalFlow { //...
+public: //...
+	bool enabled() const { return _enabled; }
+	bool healthy() const { return backend != NULL && _flags.healthy; }
+	uint8_t quality() const { return _state.surface_quality; }
+	const Vector2f& flowRate() const { return _state.flowRate; }
+	const Vector2f& bodyRate() const { return _state.bodyRate; }
+	uint8_t device_id() const { return _state.device_id; }
+    //...
+    struct OpticalFlow_state {
+    	uint8_t device_id;
+    	uint8_t  surface_quality;
+    	Vector2f flowRate;
+    	Vector2f bodyRate;
+    };
+private: //...
+};
+	\end{lstlisting}
+	\caption{Optical Flow Sensor \ac{API}}
+	\label{fig:optical_flow_api}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{lstlisting}[basicstyle=\scriptsize]
+class RangeFinder {
+public: //...
+	enum RangeFinder_Status {
+		RangeFinder_NotConnected = 0,
+		RangeFinder_NoData,
+		RangeFinder_OutOfRangeLow,
+		RangeFinder_OutOfRangeHigh,
+		RangeFinder_Good
+	};
+	
+	struct RangeFinder_State {
+		uint8_t instance;
+		uint16_t distance_cm;
+		uint16_t voltage_mv;
+		enum RangeFinder_Status status;
+		uint8_t range_valid_count;
+		bool pre_arm_check;
+		uint16_t pre_arm_distance_min;
+		uint16_t pre_arm_distance_max;
+	};
+	//...
+	uint16_t distance_cm() const { return distance_cm(primary_instance); }
+	uint16_t voltage_mv() const { return voltage_mv(primary_instance); }
+	int16_t ground_clearance_cm() const { return _ground_clearance_cm[primary_instance]; }
+	RangeFinder_Status status(void) const { return status(primary_instance);
+	//...
+private: //...
+};
+	\end{lstlisting}
+	\caption{Range Finder \ac{API}}
+	\label{fig:range_finder_api}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+    \includegraphics[width=400px]{graphics/OpticalFlowDiagram.png}
+	\caption{PX4 Optical Flow Sensor Board \ac{API}}
+	\label{fig:of_sensor_board_api}
+\end{figure}
+
+\begin{figure}[h]
+	\begin{lstlisting}[basicstyle=\scriptsize]
+static void stabilize_run()
+{
+    //...
+    // in the stabilizing flight mode check the current flight envelope
+    // measured by the optical flow sensor
+    checkEnvelope();
+    //...
+}
+
+#define BODY_RATE_ENVELOPE 4.0f
+#define FLOW_RATE_ENVELOPE 1.0f
+#define MAX_ALT 1.0f
+
+static bool checkBodyRateEnvelope() {
+        Vector2f bodyRate = optflow.bodyRate();
+        return ((bodyRate.x > -BODY_RATE_ENVELOPE) && (bodyRate.y < BODY_RATE_ENVELOPE));
+}
+
+static bool checkFlowRateEnvelope() {
+        Vector2f flowRate = optflow.flowRate();
+        return ((flowRate.x > -FLOW_RATE_ENVELOPE) && (flowRate.y < FLOW_RATE_ENVELOPE));
+}
+
+static bool checkAltitudeEnvelope() {
+        float hagl = 0.0f;
+        ahrs.get_NavEKF().getHAGL(hagl);
+        return (hagl <= MAX_ALT);
+}
+
+static void checkEnvelope() {
+        // if the flight envelope is violated, then notify an envelope alert
+        // notification subscribers include the tone alert and LED
+        if (!checkBodyRateEnvelope() || !checkFlowRateEnvelope() || !checkAltitudeEnvelope()) {
+                hal.console->printf("envelope violated\n");
+                AP_Notify::flags.envelope_alert = true;
+        } else {
+                hal.console->printf("envelope satisfied\n");
+                AP_Notify::flags.envelope_alert = false;
+        }
+}
+	\end{lstlisting}
+	\caption{Application Snippets}
+	\label{fig:application_snippets}
+\end{figure}
+
+\clearpage
 \section{Acronyms}
 \label{acronyms}
 

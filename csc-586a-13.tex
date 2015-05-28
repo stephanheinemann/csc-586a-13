@@ -9,6 +9,8 @@
 \usepackage{listings}
 \usepackage{sectsty}
 \usepackage{fancyhdr}
+\usepackage{geometry}
+\geometry{margin=1in}
 \pagestyle{fancyplain}
 \allsectionsfont{\centering \normalfont\scshape}
 \fancyhead{}
@@ -38,6 +40,8 @@
 \begin{document}
 \maketitle 
 
+\small
+\clearpage
 \section{Part III -- Sensor APIs}
 \label{sec:part3}
 
@@ -50,18 +54,20 @@ components build into the Android device, while software sensors are built on
 top of one or more hardware sensors, and interpret their data in a more useful
 fashion. Sensors for Android devices usually fall into one of these three
 categories: motion sensors, environmental sensors, and position sensors.
+\newline
 
 \par
-The Sensor \ac{API} for Android consists of four main classes and interfaces,
+The Sensor \ac{API} for Android consists of four main classes and interfaces:
 \texttt{SensorManager}, \texttt{Sensor}, \texttt{SensorEventListener}, and
 \texttt{SensorEvent}.
+\newline
 
 \par
 The \texttt{SensorManager} class is used to access a device's sensors. The
 following code demonstrates the instantiation of this class:
 
 \begin{lstlisting}[basicstyle=\small,language=Java]
-SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+	SensorManager sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 \end{lstlisting}
 
 \par
@@ -71,50 +77,56 @@ For example, to get a gyroscope sensor instance, the following code snippet
 is used:
 
 \begin{lstlisting}[basicstyle=\small,language=Java]
-Sensor s =  sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+	Sensor s =  sm.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 \end{lstlisting}
 
 \par
 \texttt{SensorEventListener} is an interface that contains two listener
 methods to be implemented by the user:
+%\texttt{onSensorChanged(SensorEvent event)},
+%\texttt{onAccuracyChanged(Sensor sensor, int accuracy)}.
 
 \begin{lstlisting}[basicstyle=\small,language=Java]
-onSensorChanged(SensorEvent event)
-onAccuracyChanged(Sensor sensor, int accuracy)
+	onSensorChanged(SensorEvent event)
+	onAccuracyChanged(Sensor sensor, int accuracy)
 \end{lstlisting}
 
 \par
-Assuming an implementation of \texttt{SensorEventListener} in a class called\\
-\texttt{MySensorEventListener}, for the gyroscope sensor, its registration
-code would look like this:
+Assuming an implementation of \texttt{SensorEventListener} in a class called
+\texttt{My\-Sen\-sor\-Event\-List\-ener}, for the gyroscope sensor, its
+registration code would look like this:
 
 \begin{lstlisting}[basicstyle=\small,language=Java]
-MySensorEventListener msel = new MySensorEventListener();
-sm.registerListener(msel, s, SensorManager.SENSOR_DELAY_UI);
+	MySensorEventListener msel = new MySensorEventListener();
+	sm.registerListener(msel, s, SensorManager.SENSOR_DELAY_UI);
 \end{lstlisting}
 
 \par
 \texttt{SENSOR\_DELAY\_UI} is one of four different delay settings, measured in
 microseconds, that controls how often \texttt{onSensorChanged} listener method
-is called. These are, in order of fastest to slowest,
+is called.
+These are, in order of fastest to slowest,
 \texttt{SENSOR\_DELAY\_FASTEST}, \texttt{SENSOR\_DELAY\_GAME},
-\texttt{SENSOR\_DELAY\_NORMAL}, and\\ \texttt{SENSOR\_DELAY\_UI}. This timing
-is just a hint to the system, events may be received faster or slower the the
-specified rate. From Android $2.3$ onwards, you can specify any delay in
-microseconds, not just these four constants.
+\texttt{SENSOR\_DELAY\_NORMAL}, and \texttt{SEN\-SOR\_\-DE\-LAY\_\-UI}. This
+timing is just a hint to the system, events may be received faster or slower than the
+specified rate. From Android $2.3$ onwards, any delay in microseconds can be
+specified, not just these four constants.
+\newline
 
 \par
-A \texttt{SensorEvent} consists of four fields - the accuracy of the event,
+A \texttt{SensorEvent} consists of four fields -- the accuracy of the event,
 which sensor generated the event, a timestamp indicating the time in
 nanoseconds that the event occurred at, and a float array of values, whose
 length and contents depends upon the type of sensor being monitored. For the
 gyroscope sensor, this float array contains three values, the angular speed
 around the $x$, $y$, and $z$ axis' in radians/second.
+\newline
 
 \par
-The Android Sensor \ac{API} consists of these four classes and interfaces - it
-does not matter what sensor you are monitoring, the only thing that changes is
-the implementation of\\ \texttt{onSensorChanged} and \texttt{onAccuracyChanged}.
+The Android Sensor \ac{API} consists of these four classes and interfaces; it
+does not matter what sensor is being monitored, the only thing that changes is
+the implementation of \texttt{on\-Sen\-sor\-Changed} and
+\texttt{onAccuracyChanged}.
 This is a very nice generic interface for Sensors.\footnote{All information is
 sourced from the Android documentation:\\
 developer.android.com/guide/topics/sensors/sensors\_overview.html}
@@ -125,44 +137,49 @@ developer.android.com/guide/topics/sensors/sensors\_overview.html}
 The {\em iOS}\footnote{https://www.apple.com/ca/ios/what-is/} platform used on
 {\em Apple}\footnote{https://www.apple.com} phones and tablets supports a
 variety of motion services via an object called \texttt{CMMotionManager}. This
-object is the gateway to raw {\em accelerometer/gyroscope/magnetometer} data,
-as well as some processed data such as {\em rotation rate}, {\em attitude},
-{\em calibrated magnetic fields}, {\em direction of gravity}, and {\em the
-direction of acceleration of the device}.
+object is the gateway to raw {\em accelerometer}, {\em gyroscope} and
+{\em magnetometer} data, as well as some processed data such as {\em rotation
+rate}, {\em attitude}, {\em calibrated magnetic fields},
+{\em direction of gravity}, and the {\em direction of acceleration} of the
+device.
 Of particular interest here, however, is the magnetometer and how the device
 handles the data collected by this sensor.
+\newline
 
 \par
 The magnetometer in the device collects magnetic field data, such as strength
 and polarity, which is accessible via the \texttt{CMMotionManager} object
 discussed above by either setting an interval at which updates can be pushed,
 or by polling the sensor whenever an update is required. If requesting updates
-at intervals the \texttt{accelerometerUpdateInterval} property must be specified
-and the \texttt{startMagnetometerUpdatesToQueue:withHandler:} method is called
-which requires a \texttt{CMMagnetometerHandler} type object be passed into it.
-This method will add data to a queue which can then be processed as needed. The
-purpose of the Handler is simply error handling. The alternative to requesting
-repeated information at intervals is periodic sampling of the data which is
-performed by calling \texttt{startMagnetometerUpdates} and then simply reading
-the \texttt{magnetomerData} property. In the case of both of these methods it
+at intervals the \texttt{accelero\-me\-ter\-Up\-date\-Inter\-val} property must
+be specified and the \texttt{startMagnetometerUpdatesToQueue:withHandler:} method is called
+which requires a \texttt{CMMagnetometerHandler} type object to be passed into
+it.
+This method will add data to a queue which can then be processed as needed.
+The alternative to requesting repeated information at intervals is periodic
+sampling of the data which is performed by calling
+\texttt{startMagnetometerUpdates} and then simply reading
+the \texttt{magnetomerData} property. For both of these methods it
 is important that the \texttt{stopMagnetometerUpdates} method is called when
 the system no longer needs to process magnetometer data. 
+\newline
 
 \par
 In order to access the data acquired from the most recent polling of the
-sensors\\
-\texttt{magnetometerData} must be accessed, this property is a structure of type
-\texttt{CMMagnetometerData}. It contains three \texttt{int} values $x$, $y$, and
+sensor, \texttt{mag\-neto\-me\-ter\-Da\-ta} must be accessed, this property is a
+structure of type \texttt{CMMagnetometerData}. It contains three \texttt{int} values $x$, $y$, and
 $z$. These \texttt{int} values represent the directional magnetic field relative
-to the body of the device using microteslas as unit. With regards to the
-coordinate system used here the $z$ axis is positive up through the front of the
+to the body of the device in microteslas. In the
+coordinate system used, the $z$ axis is positive up through the front of the
 screen, the $y$ axis is positive up through the top of the phone, and the $x$
-axis is positive to the right of the device if the screen is facing you. There
-are also two methods made for simply polling the sensor to see if it is working
-or available \texttt{magnetometerActive} and \texttt{magnetometerAvailable}. The
-method \texttt{magnetometerActive} checks to see if the sensor is currently
-taking readings and \texttt{magnetometerAvailable} checks to see if the sensor
-is available for use.
+axis is positive to the right of the device if the screen is facing the user.
+There are also two methods made for simply polling the sensor to see if it is
+working or available: \texttt{magnetometerActive} and
+\texttt{magnetometerAvailable}. The method \texttt{magnetometerActive} checks
+to see if the sensor is currently taking readings and
+\texttt{magnetometerAvailable} checks to see if the sensor is available for
+use.
+\newline
 
 \par
 The purpose of having the two separate collection methods is one of resource
@@ -174,6 +191,7 @@ only time it would be necessary to use the queuing method is if the data needs
 to be incredibly precise and with little latency between updates, such as if
 the device were being used as a magnetometer in an experiment measuring
 magnetic flux.
+\newline
 
 \subsection{NuttX / ArduPilot PX4 Optical Flow and Sonar API}
 \label{sec:ardupilot_flow_api}
@@ -185,34 +203,37 @@ including {\em Plane}, {\em Copter} and {\em Rover}. It builds on top of the
 {\em NuttX}\footnote{http://nuttx.org/} operating system and requires the
 applicable firmware for the underlying hardware such as the
 {\em Pixhawk}\footnote{https://pixhawk.org} autopilot module.
+\newline
 
 \par
 The supported sensor types include those to capture data about the vehicle's
 {\em environment} as well as those related to its own {\em capabilities} in
 order to establish an adequate {\em situational awareness}.
-Examples of supported environment sensors gather {\em inertial} (attitude and
+Supported environmental sensors gather {\em inertial} (attitude and
 acceleration), {\em barometric} (altitude and airspeed), {\em magnetic}
 (direction), {\em range} (distance), {\em optical} (orientation and recognition)
 and {\em satellite} (position) data. Sensors that capture the vehicle's
 capability state include a {\em battery monitor} (power consumption and
-endurance) and a {\em performance monitor} (scheduler latency). Environment
-sensors themselves may provide {\em health} and {\em quality} monitoring
-functions. Furthermore, all information that is provided by the {\em NuttX}
+endurance) and a {\em performance monitor} (scheduler latency). Environmental
+sensors themselves may provide self-reflective {\em health} and {\em quality}
+monitoring functions. Furthermore, all information that is provided by the {\em NuttX}
 operating system about its {\em Pixhawk} platform including the available
 {\em memory} and {\em filesystem} space can be instrumented to enhance the
 vehicle's capability state.
+\newline
 
 \par
 The {ArduPilot} \ac{API} separates sensor {\em frontends} (interfaces) from
 their actual {\em backends} (implementations) in order to easily support
-different sensors of the same class. These and other \ac{HAL} modules can be
-found in the \texttt{libraries}
+different sensors of the same class. These sensors and other \ac{HAL} modules
+can be found in the \texttt{libraries}
 directory\footnote{https://github.com/diydrones/ardupilot} and are, hence,
 separate from any concrete vehicle-related software. The {\em Copter} vehicle
 employs the sensor \ac{API} through its \texttt{sensors.pde} arduino sketch
 file which represents an even higher level
 \ac{API}\footnote{http://www.arduino.cc/en/pmwiki.php?n=Reference/HomePage}
 to the actual vehicle functions such as different autoflight modes.
+\newline
 
 \par
 As a representative example, the structure of the {\em PX$4$ Optical Flow /
@@ -220,15 +241,8 @@ Sonar}\footnote{https://pixhawk.org/modules/px4flow} sensor interface shall be
 explained. It is connected to the {\em Pixhawk} autopilot module as shown in
 Figure \ref{fig:pixhawk_px4_flow_connection}.
 
-\begin{figure}[h]
-	\centering
-    \includegraphics[width=400px]{graphics/PixhawkPX4Flow.png}
-	\caption{Pixhawk PX4 Flow Connection}
-	\label{fig:pixhawk_px4_flow_connection}
-\end{figure}
-
 \par
-This sensor allows to capture the optical flow, that is, the rate of
+This sensor allows capturing the optical flow, that is, the rate of
 translational and rotational changes in a captured image, in order to establish
 positional information. The optical flow camera is mounted on the bottom of the
 {\em Iris}\footnote{http://3drobotics.com/iris/} quadcopter body pointing
@@ -238,6 +252,7 @@ range finder (sonar sensor) on the same sensor board is employed to relate the
 optical flow information to the measured ground distances accordingly. Assuming
 the actual attitude of the aircraft based on inertial sensors is known, an
 actual ground distance can be derived from the sonar slant range readings.
+\newline
 
 \par
 Figure \ref{fig:optical_flow_api} shows a small extract of the optical flow
@@ -246,30 +261,7 @@ directory possessing the sensor state data structure as well as methods that det
 flow and body rates in a two-dimensional image. The interface itself
 furthermore consists of methods that determine the health of the sensor and the
 quality of the data being captured by it.
-
-\begin{figure}[h]
-	\begin{lstlisting}[basicstyle=\scriptsize]
-class OpticalFlow { //...
-public: //...
-	bool enabled() const { return _enabled; }
-	bool healthy() const { return backend != NULL && _flags.healthy; }
-	uint8_t quality() const { return _state.surface_quality; }
-	const Vector2f& flowRate() const { return _state.flowRate; }
-	const Vector2f& bodyRate() const { return _state.bodyRate; }
-	uint8_t device_id() const { return _state.device_id; }
-    //...
-    struct OpticalFlow_state {
-    	uint8_t device_id;
-    	uint8_t  surface_quality;
-    	Vector2f flowRate;
-    	Vector2f bodyRate;
-    };
-private: //...
-};
-	\end{lstlisting}
-	\caption{Optical Flow Sensor \ac{API}}
-	\label{fig:optical_flow_api}
-\end{figure}
+\newline
 
 \par
 Figure \ref{fig:range_finder_api} shows an \ac{API} extract of the range finder
@@ -278,60 +270,20 @@ board, a sonar sensor is employed to obtain range in order to relate optical
 flow to ground distance. This concrete implementation is abstracted by the
 more generic range finder \ac{API} in the \texttt{libraries/AP\_RangeFinder}
 directory.
-
-\begin{figure}[h]
-	\begin{lstlisting}[basicstyle=\scriptsize]
-class RangeFinder {
-public: //...
-	enum RangeFinder_Status {
-		RangeFinder_NotConnected = 0,
-		RangeFinder_NoData,
-		RangeFinder_OutOfRangeLow,
-		RangeFinder_OutOfRangeHigh,
-		RangeFinder_Good
-	};
-	
-	struct RangeFinder_State {
-		uint8_t instance;
-		uint16_t distance_cm;
-		uint16_t voltage_mv;
-		enum RangeFinder_Status status;
-		uint8_t range_valid_count;
-		bool pre_arm_check;
-		uint16_t pre_arm_distance_min;
-		uint16_t pre_arm_distance_max;
-	};
-	//...
-	uint16_t distance_cm() const { return distance_cm(primary_instance); }
-	uint16_t voltage_mv() const { return voltage_mv(primary_instance); }
-	int16_t ground_clearance_cm() const { return _ground_clearance_cm[primary_instance]; }
-	RangeFinder_Status status(void) const { return status(primary_instance);
-	//...
-private: //...
-};
-	\end{lstlisting}
-	\caption{Range Finder \ac{API}}
-	\label{fig:range_finder_api}
-\end{figure}
+\newline
 
 \par
 The \texttt{sensors.pde} arduino sketch file uses the above \ac{API} in order
 to provide the {\em Copter} vehicle with necessary sensor data to perform its
 functions such as automatic flight modes. The overall static structure is shown
 in Figure \ref{fig:of_sensor_board_api}.
-
-\begin{figure}[h]
-	\centering
-    \includegraphics[width=400px]{graphics/OpticalFlowDiagram.png}
-	\caption{PX4 Optical Flow Sensor Board \ac{API}}
-	\label{fig:of_sensor_board_api}
-\end{figure}
+\newline
 
 \subsection{Application Example}
 \label{sec:application_example}
 \par
 A small application example makes use of the {\em PX$4$ Optical Flow} board
-connected to the {\em Iris} {\em Pixhawk} autopilot module. The application
+connected to the {\em Iris} {\em Pixhawk} autopilot module. This application
 realizes a flight envelope warning alert. The alert is triggered whenever
 translational flow or rotational body rates exceed a certain limit. It is
 also triggered when the \ac{AHRS}\footnote{
@@ -339,12 +291,14 @@ http://en.wikipedia.org/wiki/Attitude\_and\_heading\_reference\_system}
 which fuses different sensor inputs for the current height of the aircraft
 including the sonar distance reports a height above ground that exceeds a
 certain threshold.
+\newline
 
 \par
 The alert consist a series of high pitch tones whenever the normal envelope
 is violated and a long low pitch tone as soon as the normal flight envelope
 is re-established. Furthermore, the aircraft status \ac{LED} continues to
-flash red as long as the normal envelope is violated.
+flash red as long as the normal envelope is violated. Snippets of the
+documented application code can be found in the Appendix \ref{figures}.
 
 \subsection{Application in the Cloud}
 \label{sec:application_cloud}
@@ -354,12 +308,13 @@ support higher-level autopilot modes such as loitering and following a
 sequence of legs between waypoints. It can be fused with other sensor data
 and provide a higher degree of redundancy. The tracks and sensor data of
 small \acp{UAV} can be shared in the cloud. Such an existing project is
-called {\em Dronshare}\footnote{http://www.droneshare.com/}. Having access
-to and being able to mine shared mission data enables the more
+called {\em Droneshare}\footnote{http://www.droneshare.com/}. Having access
+to and being able to mine shared mission data enables more
 efficient planning and execution of coordinated missions that involve
 multiple \acp{UAV}. Examples of coordinated missions include {\em aerial
 surveillance}, {\em crop spraying} and {\em search and rescue} among many
-other applications.
+other applications. Sharing position and altitude of \acp{UAV} can also
+be used for enforcing compliance with airspace restrictions.
 
 \clearpage
 \label{appendix}
