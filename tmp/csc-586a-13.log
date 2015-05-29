@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.24)  28 MAY 2015 15:23
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.6.24)  29 MAY 2015 09:20
 entering extended mode
  restricted \write18 enabled.
  Source specials enabled.
@@ -794,27 +794,19 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 [5
 
  <./graphics/PixhawkPX4Flow.png>] [6] [7 <./graphics/OpticalFlowDiagram.png>] [
-8]
-Overfull \hbox (20.92868pt too wide) in paragraph at lines 189--195
-\T1/futs/m/n/10 A the-ory of ev-ery-thing or fi-nal the-ory, ul-ti-mate the-ory
-, or mas-ter the-ory is a hy-po-thet-i-cal sin-gle, all-encompassing,
+8])
+Underfull \hbox (badness 10000) in paragraph at lines 168--322
+
  []
 
 [9
 
-]) [10] (./csc-586a-13.bbl
-
-LaTeX Warning: Empty `thebibliography' environment or \BreakBibliography
-               before end of `thebibliography' environment on input line 3.
-
-) [11
-
 ] (./csc-586a-13.aux) ) 
 Here is how much of TeX's memory you used:
- 7446 strings out of 494980
- 107037 string characters out of 6179358
- 277195 words of memory out of 5000000
- 10492 multiletter control sequences out of 15000+600000
+ 7432 strings out of 494980
+ 106890 string characters out of 6179358
+ 276940 words of memory out of 5000000
+ 10481 multiletter control sequences out of 15000+600000
  121188 words of font info for 126 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  35i,11n,58p,294b,1125s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -825,9 +817,9 @@ ve/texmf-dist/fonts/type1/public/fourier/fourier-ms.pfb></usr/share/texlive/tex
 mf-dist/fonts/type1/adobe/utopia/putb8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/adobe/utopia/putr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/adob
 e/utopia/putri8a.pfb>
-Output written on csc-586a-13.pdf (11 pages, 735118 bytes).
+Output written on csc-586a-13.pdf (9 pages, 730654 bytes).
 PDF statistics:
- 127 PDF objects out of 1000 (max. 8388607)
+ 117 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  11 words of extra memory for PDF output out of 10000 (max. 10000000)
 
